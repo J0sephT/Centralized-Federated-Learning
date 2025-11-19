@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: fl_server
+    ports:
+      - "5000:5000"
+    environment:
+      - NUM_CLIENTS=3
+      - NUM_ROUNDS=10
+      - AGGREGATION_METHOD=fedavg
+      - DATASET_PATH=data/CAN_HCRL_OTIDS_UB.csv
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./results:/app/results
+    networks:
+      - fl_network
+    command: python server/server.py
+
+  client_0:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: fl_client_0
+    depends_on:
+      - server
+    environment:
+      - CLIENT_ID=0
+      - SERVER_URL=http://server:5000
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - fl_network
+    command: >
+      sh -c "sleep 10 && python client/client.py --client_id 0 --server_url http://server:5000 --data_dir data/"
+
+  client_1:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: fl_client_1
+    depends_on:
+      - server
+    environment:
+      - CLIENT_ID=1
+      - SERVER_URL=http://server:5000
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - fl_network
+    command: >
+      sh -c "sleep 15 && python client/client.py --client_id 1 --server_url http://server:5000 --data_dir data/"
+
+  client_2:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: fl_client_2
+    depends_on:
+      - server
+    environment:
+      - CLIENT_ID=2
+      - SERVER_URL=http://server:5000
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - fl_network
+    command: >
+      sh -c "sleep 20 && python client/client.py --client_id 2 --server_url http://server:5000 --data_dir data/"
+
+  coordinator:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: fl_coordinator
+    depends_on:
+      - server
+      - client_0
+      - client_1
+      - client_2
+    environment:
+      - SERVER_URL=http://server:5000
+    networks:
+      - fl_network
+    command: >
+      sh -c "sleep 30 && python scripts/coordinator.py --server_url http://server:5000 --num_clients 3 --num_rounds 10"
+
+networks:
+  fl_network:
+    driver: bridge

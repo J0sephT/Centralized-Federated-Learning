@@ -1,0 +1,22 @@
+# Core ML & Deep Learning
+tensorflow>=2.16.0
+numpy>=1.26.0
+pandas>=2.1.0
+scikit-learn>=1.3.0
+
+# Web Framework
+flask>=3.0.0
+requests>=2.31.0
+
+# Visualization
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Utilities
+tqdm>=4.66.1
+colorama>=0.4.6
+joblib>=1.3.2
+python-json-logger>=2.0.7
+
+# Development (opcional)
+# python-dotenv>=1.0.0
