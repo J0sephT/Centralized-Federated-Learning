@@ -3,13 +3,21 @@ Modelo de red neuronal para Federated Learning
 """
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Input, Dropout
+from tensorflow.keras.layers import Dense, Input, BatchNormalization  
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import l2 
 
 
-def create_model(input_shape=(8,), num_classes=4, learning_rate=0.001):
+def create_model(input_shape=(8,), num_classes=4, learning_rate=0.0001):
     """
     Crea un modelo de red neuronal para clasificación multiclase.
+    OPTIMIZADO PARA FEDERATED LEARNING.
+    
+    CAMBIOS:
+    - Learning rate: 0.001 → 0.0001 (más estable en FL)
+    - Dropout ELIMINADO (causa inestabilidad en agregación)
+    - BatchNormalization agregado (mejor convergencia)
+    - Regularización L2 (previene overfitting)
     
     Args:
         input_shape: Forma de entrada (número de features)
@@ -21,10 +29,20 @@ def create_model(input_shape=(8,), num_classes=4, learning_rate=0.001):
     """
     model = Sequential([
         Input(shape=input_shape, dtype='float32'),
-        Dense(64, activation='relu', name='dense_1'),
-        Dropout(0.2, name='dropout_1'),
-        Dense(32, activation='relu', name='dense_2'),
-        Dropout(0.2, name='dropout_2'),
+        
+        # Capa 1: Dense + BatchNorm (sin Dropout)
+        Dense(64, activation='relu', 
+              kernel_regularizer=l2(0.001),
+              name='dense_1'),
+        BatchNormalization(name='bn_1'),
+        
+        # Capa 2: Dense + BatchNorm (sin Dropout)
+        Dense(32, activation='relu',
+              kernel_regularizer=l2(0.001),
+              name='dense_2'),
+        BatchNormalization(name='bn_2'),
+        
+        # Salida
         Dense(num_classes, activation='softmax', name='output')
     ])
     
@@ -35,7 +53,6 @@ def create_model(input_shape=(8,), num_classes=4, learning_rate=0.001):
     )
     
     return model
-
 
 def get_model_weights(model):
     """

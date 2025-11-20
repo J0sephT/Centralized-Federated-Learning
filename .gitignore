@@ -153,8 +153,23 @@ results/figures/
 
 # Data files (uncomment if you don't want to track data)
 data/*.csv
+data_iid/*.csv
+data_noniid_08/*.csv
 # data/*.parquet
 # data/*.pkl
+
+# Resultados experimentales
+results/*.json
+results/*.png
+results/*.csv
+
+# Datos procesados
+data/client_*_data.csv
+data_iid/
+data_noniid_*/
+
+# Logs
+logs/*.log
 
 # Model checkpoints
 *.pth

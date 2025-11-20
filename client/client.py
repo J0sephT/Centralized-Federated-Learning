@@ -48,8 +48,8 @@ class FederatedClient:
                  client_id: str,
                  server_url: str,
                  data_dir: str = 'data',
-                 local_epochs: int = 2,
-                 batch_size: int = 32):
+                 local_epochs: int = 5,
+                 batch_size: int = 16):
         """
         Inicializa el cliente federado.
         
